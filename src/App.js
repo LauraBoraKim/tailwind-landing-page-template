@@ -1,57 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
+import Nav from './components/Nav';
+import ItemListContainer from './pages/ItemListContainer';
+import './App.css';
 import {
+  BrowserRouter as Router,
   Switch,
   Route,
-  useLocation
-} from 'react-router-dom';
-
-import './css/style.scss';
-
-import AOS from 'aos';
-import { focusHandling } from 'cruip-js-toolkit';
-
-import Home from './pages/Home';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import ResetPassword from './pages/ResetPassword';
+} from "react-router-dom";
+import ShoppingCart from './pages/ShoppingCart';
+import { initialState } from './assets/state';
 
 function App() {
 
-  const location = useLocation();
+  const [items, setItems] = useState(initialState.items);
+  const [cartItems, setCartItems] = useState(initialState.cartItems);
 
-  useEffect(() => {
-    AOS.init({
-      once: true,
-      disable: 'phone',
-      duration: 700,
-      easing: 'ease-out-cubic',
-    });
-  });
-
-  useEffect(() => {
-    document.querySelector('html').style.scrollBehavior = 'auto'
-    window.scroll({ top: 0 })
-    document.querySelector('html').style.scrollBehavior = ''
-    focusHandling('outline');
-  }, [location.pathname]); // triggered on route change
+  const countCartItems = (cartItems) => {
+    let cnt = 0
+    cartItems.map(item => {
+      cnt += item.quantity
+    })
+    return cnt
+  }
 
   return (
-    <>
+    <Router>
+      <Nav cntOfItems={countCartItems(cartItems)}/>
       <Switch>
-        <Route exact path="/">
-          <Home />
+        <Route exact={true} path="/">
+          <ItemListContainer items={items}  cartItems={cartItems} setCartItems={setCartItems}/>
         </Route>
-        <Route path="/signin">
-          <SignIn />
-        </Route>
-        <Route path="/signup">
-          <SignUp />
-        </Route>
-        <Route path="/reset-password">
-          <ResetPassword />
+        <Route path="/shoppingcart">
+          <ShoppingCart cartItems={cartItems} items={items} setCartItems={setCartItems}/>
         </Route>
       </Switch>
-    </>
+    </Router>
   );
 }
 
